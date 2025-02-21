@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - YogaLife</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+        .yoga-background {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>YogaLife</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/articles.html">Articles</a>
+            <a href="/events.html">Events</a>
+            <div class="auth-links">
+                <a href="/login.html" class="login-btn">Login</a>
+                <a href="/register.html" class="register-btn active">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <main style="margin-top: 80px;">
+        <div class="form-container">
+            <h2>Create Your Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+                </div>
+
+                <div class="yoga-background">
+                    <h3>Yoga Background (Optional)</h3>
+                    <div class="form-group">
+                        <label for="experience">Years of Experience</label>
+                        <input type="text" id="experience" name="experience">
+                    </div>
+                    <div class="form-group">
+                        <label for="certifications">Certifications (comma-separated)</label>
+                        <input type="text" id="certifications" name="certifications" placeholder="e.g., RYT 200, Ashtanga Level 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="teachingExperience">Teaching Experience</label>
+                        <textarea id="teachingExperience" name="teachingExperience" placeholder="Describe your teaching experience..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="specializations">Specializations (comma-separated)</label>
+                        <input type="text" id="specializations" name="specializations" placeholder="e.g., Hatha, Vinyasa, Meditation">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Register</button>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+            </form>
+            <p style="margin-top: 1rem;">
+                Already have an account? <a href="/login.html">Login here</a>
+            </p>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Get yoga background information
+            const yogaBackground = {
+                experience: document.getElementById('experience').value,
+                certifications: document.getElementById('certifications').value.split(',').map(cert => cert.trim()).filter(cert => cert),
+                teachingExperience: document.getElementById('teachingExperience').value,
+                specializations: document.getElementById('specializations').value.split(',').map(spec => spec.trim()).filter(spec => spec)
+            };
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        yogaBackground
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successMessage.textContent = data.message || 'Registration successful! Please wait for admin verification.';
+                    successMessage.style.display = 'block';
+                    
+                    // Store token and user info
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/profile.html';
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = data.error || 'Registration failed';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                errorMessage.textContent = 'An error occurred during registration';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+/* Book Order Animations */
+@keyframes addToCart {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes orderSuccess {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.book-card {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.book-card img {
+    transition: transform 0.3s ease;
+}
+
+.book-card:hover img {
+    transform: scale(1.05);
+}
+
+.add-to-cart {
+    animation: addToCart 0.5s ease;
+}
+
+.order-success {
+    animation: orderSuccess 0.8s ease-out;
+}
+
+.order-error {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Order Process Steps */
+.order-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    position: relative;
+}
+
+.step {
+    position: relative;
+    z-index: 1;
+    padding: 10px 20px;
+    background: #fff;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    background: #4CAF50;
+    color: white;
+    transform: scale(1.1);
+}
+
+.step.completed {
+    background: #2196F3;
+    color: white;
+}
+
+.step-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ddd;
+    z-index: 0;
+}
+
+/* Loading Animation */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success Animation */
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.success-checkmark .check-icon {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    border-radius: 50%;
+    box-sizing: content-box;
+    border: 4px solid #4CAF50;
+}
+
+.success-checkmark .check-icon::before {
+    content: "";
+    position: absolute;
+    transform: rotate(45deg);
+    height: 30px;
+    width: 15px;
+    border-bottom: 4px solid #4CAF50;
+    border-right: 4px solid #4CAF50;
+    top: 30%;
+    left: 35%;
+    animation: checkmark 0.3s ease-in-out forwards;
+}
+
+@keyframes checkmark {
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 0;
+    }
+    100% {
+        height: 30px;
+        width: 15px;
+        opacity: 1;
+    }
+}
+
+/* Modal Animation */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Book Card Hover Effects */
+.book-price {
+    position: relative;
+    display: inline-block;
+}
+
+.book-price::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+.book-card:hover .book-price::after {
+    width: 100%;
+}
+
+.buy-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.buy-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.buy-button:hover::before {
+    width: 200%;
+    height: 200%;
+}
+
+/* Order Confirmation Animation */
+.order-confirmation {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideIn 0.5s ease forwards;
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Progress Bar Animation */
+.progress-bar {
+    height: 4px;
+    width: 0;
+    background: linear-gradient(to right, #4CAF50, #2196F3);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    animation: progress 2s ease-in-out forwards;
+}
+
+@keyframes progress {
+    0% { width: 0; }
+    100% { width: 100%; }
+}

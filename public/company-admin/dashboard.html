@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - YogaLife</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .nav-link {
+            color: #495057;
+        }
+        .nav-link.active {
+            color: #0d6efd !important;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .stats-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            height: 100%;
+            background: white;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-header {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+        }
+        .stats-header h5 {
+            margin: 0;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        .stats-body {
+            padding: 1.5rem;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        .stat-row:hover {
+            background-color: #f8f9fa;
+        }
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+        .stat-label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .stat-value.primary { background: #ebf8ff; color: #2b6cb0; }
+        .stat-value.success { background: #f0fff4; color: #2f855a; }
+        .stat-value.warning { background: #fffaf0; color: #c05621; }
+        .stat-value.danger { background: #fff5f5; color: #c53030; }
+        .article-content {
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .article-image {
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-label {
+            font-weight: bold;
+        }
+        .table-responsive {
+    margin-top: 1rem;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+}
+
+.table th {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0,0,0,.075);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-size: 0.75em;
+    font-weight: 500;
+    border-radius: 0.25rem;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">YogaLife Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="logout()">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <!-- Users Stats -->
+            <div class="col-md-4 mb-4">
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <h5><i class="bi bi-people-fill me-2"></i>Users Overview</h5>
+                    </div>
+                    <div class="stats-body">
+                        <div class="stat-row">
+                            <span class="stat-label">Total Users</span>
+                            <span class="stat-value primary" id="totalUsers">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Verified Users</span>
+                            <span class="stat-value success" id="verifiedUsers">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Unverified Users</span>
+                            <span class="stat-value warning" id="unverifiedUsers">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Pending Verification</span>
+                            <span class="stat-value danger" id="pendingVerifications">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles Stats -->
+            <div class="col-md-4 mb-4">
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <h5><i class="bi bi-file-text-fill me-2"></i>Articles Overview</h5>
+                    </div>
+                    <div class="stats-body">
+                        <div class="stat-row">
+                            <span class="stat-label">Total Articles</span>
+                            <span class="stat-value primary" id="totalArticles">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Published Articles</span>
+                            <span class="stat-value success" id="publishedArticles">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Pending Articles</span>
+                            <span class="stat-value warning" id="pendingArticles">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Stats -->
+            <div class="col-md-4 mb-4">
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <h5><i class="bi bi-calendar-event-fill me-2"></i>Events Overview</h5>
+                    </div>
+                    <div class="stats-body">
+                        <div class="stat-row">
+                            <span class="stat-label">Total Events</span>
+                            <span class="stat-value primary" id="totalEvents">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Upcoming Events</span>
+                            <span class="stat-value success" id="upcomingEvents">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Ongoing Events</span>
+                            <span class="stat-value warning" id="ongoingEvents">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Completed Events</span>
+                            <span class="stat-value danger" id="completedEvents">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action active" onclick="showDashboard()">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" onclick="showPendingUsers()">
+                        <i class="bi bi-people"></i> Pending Users
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" onclick="showArticles()">
+                        <i class="bi bi-file-text"></i> Articles
+                    </a>
+                    
+                    <a href="/company-admin/ecommerce.html" class="list-group-item list-group-item-action">
+                        <i class="bi bi-shop"></i> E-commerce
+                    </a>
+                   
+                </div>
+            </div>
+
+            
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="verifications-tab" data-bs-toggle="tab" href="#verifications" role="tab">
+                                    Author Verifications
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="articles-tab" data-bs-toggle="tab" href="#articles" role="tab">
+                                    Articles
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="events-tab" data-bs-toggle="tab" href="#events" role="tab">
+                                    Events
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="bookings-tab" data-bs-toggle="tab" href="#bookings" role="tab">
+                                    Event Bookings
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Verifications Tab -->
+                            <div class="tab-pane fade show active" id="verifications" role="tabpanel">
+                                <h4 class="mb-4">Pending Author Verifications</h4>
+                                <div id="pendingVerificationsContainer">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Articles Tab -->
+                            <div class="tab-pane fade" id="articles" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h4>Articles Management</h4>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addArticleModal">
+                                        <i class="bi bi-plus-circle"></i> Add New Article
+                                    </button>
+                                </div>
+                                <div id="articlesContainer">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Events Tab -->
+                            <div class="tab-pane fade" id="events" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h4>Events Management</h4>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                                        <i class="bi bi-plus-circle"></i> Add New Event
+                                    </button>
+                                </div>
+                                <div id="eventsList" class="row"></div>
+                            </div>
+
+                            <!-- Bookings Tab -->
+                            <div class="tab-pane fade" id="bookings" role="tabpanel">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">Event Bookings</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Event Name</th>
+                                                    <th>User Details</th>
+                                                    <th>Contact Info</th>
+                                                    <th>Tickets</th>
+                                                    <th>Total Amount</th>
+                                                    <th>Booking Date</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="bookingsTableBody">
+                                                <!-- Bookings will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Article Modal -->
+    <div class="modal fade" id="addArticleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addArticleForm">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="yogabhyas">Yogabhyas</option>
+                                <option value="yogicdiet">Yogic Diet</option>
+                                <option value="yogicscripture">Yogic Scripture</option>
+                                <option value="satkarma">Satkarma</option>
+                                <option value="meditation">Meditation</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Content</label>
+                            <textarea class="form-control" name="content" rows="10" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Article Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitArticle()">Add Article</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEventForm" onsubmit="submitEvent(event)">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Short Description</label>
+                            <input type="text" class="form-control" name="shortDescription" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Description</label>
+                            <textarea class="form-control" name="description" rows="4" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Time</label>
+                            <input type="time" class="form-control" name="time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Image URL</label>
+                            <input type="url" class="form-control" name="imageUrl" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control mb-2" name="venue" placeholder="Venue" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control mb-2" name="address" placeholder="Address" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="city" placeholder="City" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="state" placeholder="State" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="zipCode" placeholder="Zip Code" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ticket Types</label>
+                            <div id="ticketTypesContainer">
+                                <div class="ticket-type row mb-2">
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" name="ticketName[]" placeholder="Name" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" class="form-control" name="ticketPrice[]" placeholder="Price" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" name="ticketDescription[]" placeholder="Description" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" class="form-control" name="ticketQuantity[]" placeholder="Quantity" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-2" id="addTicketType">Add Ticket Type</button>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Create Event</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Get token from localStorage
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/company-admin/login.html';
+        }
+
+        // Load Dashboard Stats
+        async function loadDashboardStats() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/users/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const stats = await response.json();
+
+                // Update Users Stats
+                document.getElementById('totalUsers').textContent = stats.users.total;
+                document.getElementById('verifiedUsers').textContent = stats.users.verified;
+                document.getElementById('unverifiedUsers').textContent = stats.users.unverified;
+                document.getElementById('pendingVerifications').textContent = stats.users.pendingVerification;
+
+                // Update Articles Stats
+                document.getElementById('totalArticles').textContent = stats.articles.total;
+                document.getElementById('publishedArticles').textContent = stats.articles.published;
+                document.getElementById('pendingArticles').textContent = stats.articles.pending;
+
+                // Update Events Stats
+                document.getElementById('totalEvents').textContent = stats.events.total;
+                document.getElementById('upcomingEvents').textContent = stats.events.upcoming;
+                document.getElementById('ongoingEvents').textContent = stats.events.ongoing;
+                document.getElementById('completedEvents').textContent = stats.events.completed;
+
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        // Load pending users
+        async function loadPendingUsers() {
+            try {
+                const response = await fetch('/api/users/pending', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const users = await response.json();
+                const container = document.getElementById('pendingVerificationsContainer');
+                
+                if (users.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No pending verifications</p>';
+                    return;
+                }
+
+                container.innerHTML = users.map(user => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${user.name}</h5>
+                            <div class="user-details">
+                                <p><strong>Email:</strong> ${user.email}</p>
+                                <p><strong>Phone:</strong> ${user.phone || 'Not provided'}</p>
+                                <p><strong>Experience Level:</strong> ${user.experienceLevel || 'Not specified'}</p>
+                                <p><strong>Interests:</strong> ${user.interests ? user.interests.join(', ') : 'Not specified'}</p>
+                                
+                                ${user.yogaBackground ? `
+                                    <div class="yoga-background mt-3">
+                                        <h6 class="mb-2">Yoga Background:</h6>
+                                        <p><strong>Experience:</strong> ${user.yogaBackground.experience || 'Not specified'}</p>
+                                        <p><strong>Certifications:</strong> ${user.yogaBackground.certifications ? user.yogaBackground.certifications.join(', ') : 'None'}</p>
+                                        <p><strong>Teaching Experience:</strong> ${user.yogaBackground.teachingExperience || 'Not specified'}</p>
+                                        <p><strong>Specializations:</strong> ${user.yogaBackground.specializations ? user.yogaBackground.specializations.join(', ') : 'None'}</p>
+                                    </div>
+                                ` : ''}
+                                ${user.additionalInfo ? `
+                                    <div class="additional-info mt-3">
+                                        <h6 class="mb-2">Additional Information:</h6>
+                                        <p>${user.additionalInfo}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="btn-group mt-3">
+                                <button class="btn btn-success" onclick="verifyUser('${user._id}', 'approved')">
+                                    <i class="bi bi-check-circle"></i> Approve
+                                </button>
+                                <button class="btn btn-danger ms-2" onclick="verifyUser('${user._id}', 'rejected')">
+                                    <i class="bi bi-x-circle"></i> Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading pending users:', error);
+                document.getElementById('pendingVerificationsContainer').innerHTML = 
+                    '<div class="alert alert-danger">Failed to load pending verifications</div>';
+            }
+        }
+
+        // Load Articles
+        async function loadArticles() {
+            const articlesDiv = document.getElementById('articlesContainer');
+            articlesDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+
+            try {
+                const response = await fetch('/api/company-admin/articles', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const articles = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(articles.error || 'Failed to load articles');
+                }
+
+                if (articles.length === 0) {
+                    articlesDiv.innerHTML = '<div class="alert alert-info">No articles found</div>';
+                    return;
+                }
+
+                const articlesHtml = articles.map(article => `
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img src="${article.imageUrl}" class="img-fluid rounded article-image" alt="Article image">
+                                </div>
+                                <div class="col-md-8">
+                                    <h5 class="card-title">${article.title}</h5>
+                                    <p class="card-text mb-1">
+                                        <strong>Author:</strong> ${article.author?.name || 'Unknown'} 
+                                        (${article.author?.email || 'No email'})
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <strong>Category:</strong> ${article.category}
+                                        <span class="badge bg-${article.status === 'published' ? 'success' : article.status === 'pending' ? 'warning' : 'danger'} ms-2">
+                                            ${article.status}
+                                        </span>
+                                    </p>
+                                    <div class="article-content mb-3">
+                                        ${article.content}
+                                    </div>
+                                    <div class="btn-group">
+                                        ${article.status === 'pending' ? `
+                                            <button class="btn btn-success me-2" onclick="approveArticle('${article._id}')">
+                                                Approve Article
+                                            </button>
+                                            <button class="btn btn-danger me-2" onclick="rejectArticle('${article._id}')">
+                                                Reject Article
+                                            </button>
+                                        ` : ''}
+                                        <button class="btn btn-outline-danger" onclick="deleteArticle('${article._id}')">
+                                            Delete Article
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                articlesDiv.innerHTML = articlesHtml;
+            } catch (error) {
+                console.error('Error loading articles:', error);
+                articlesDiv.innerHTML = `<div class="alert alert-danger">Error loading articles: ${error.message}</div>`;
+            }
+        }
+
+        // Load Events
+        async function loadEvents() {
+            const eventsDiv = document.getElementById('eventsList');
+            eventsDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+
+            try {
+                const response = await fetch('/api/company-admin/events', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const events = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(events.error || 'Failed to load events');
+                }
+
+                if (events.length === 0) {
+                    eventsDiv.innerHTML = '<div class="alert alert-info">No events found</div>';
+                    return;
+                }
+
+                const eventsHtml = events.map(event => `
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="${event.imageUrl || '/images/default-event.jpg'}" class="card-img-top" alt="Event image" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">${event.title}</h5>
+                                <p class="card-text">${event.shortDescription}</p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <strong>Date:</strong> ${new Date(event.date).toLocaleDateString()}<br>
+                                        <strong>Time:</strong> ${event.time}<br>
+                                        <strong>Location:</strong> ${event.location ? `${event.location.venue}, ${event.location.city}` : 'Location not specified'}
+                                    </small>
+                                </p>
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-outline-danger" onclick="deleteEvent('${event._id}')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                eventsDiv.innerHTML = eventsHtml;
+            } catch (error) {
+                console.error('Error loading events:', error);
+                eventsDiv.innerHTML = `<div class="alert alert-danger">Error loading events: ${error.message}</div>`;
+            }
+        }
+
+        // Function to load event bookings
+        async function loadEventBookings() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/bookings', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch bookings');
+                }
+
+                const bookings = await response.json();
+                const tableBody = document.getElementById('bookingsTableBody');
+                tableBody.innerHTML = '';
+
+                if (!bookings || bookings.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">No bookings found</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                bookings.forEach(booking => {
+                    // Ensure booking has all required properties
+                    const safeBooking = {
+                        event: booking.event || { title: 'Event Deleted' },
+                        user: booking.user || { name: 'User Deleted', email: 'N/A' },
+                        bookingDetails: booking.bookingDetails || { phone: 'N/A', address: 'N/A', city: 'N/A' },
+                        tickets: booking.tickets || [],
+                        totalAmount: booking.totalAmount || 0,
+                        paymentDetails: booking.paymentDetails || { status: 'unknown' },
+                        createdAt: booking.createdAt || new Date(),
+                        status: booking.status || 'unknown'
+                    };
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <strong>${safeBooking.event.title}</strong>
+                        </td>
+                        <td>
+                            <div><strong>Name:</strong> ${safeBooking.user.name}</div>
+                            <div><strong>Email:</strong> ${safeBooking.user.email}</div>
+                        </td>
+                        <td>
+                            <div><strong>Phone:</strong> ${safeBooking.bookingDetails.phone}</div>
+                            <div><strong>Address:</strong> ${safeBooking.bookingDetails.address}</div>
+                            <div><strong>City:</strong> ${safeBooking.bookingDetails.city}</div>
+                        </td>
+                        <td>
+                            ${safeBooking.tickets.map(t => `
+                                <div class="mb-1">
+                                    <strong>${t.quantity || 0} x ${(t.ticketType && t.ticketType.name) || 'Unknown Ticket'}</strong>
+                                    <div class="text-muted">₹${(t.ticketType && t.ticketType.price) || 0} each</div>
+                                </div>
+                            `).join('')}
+                        </td>
+                        <td>
+                            <strong>₹${safeBooking.totalAmount}</strong>
+                        </td>
+                        <td>
+                            ${new Date(safeBooking.createdAt).toLocaleDateString('en-IN', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                            })}
+                        </td>
+                        <td>
+                            <span class="badge bg-${safeBooking.paymentDetails.status === 'completed' ? 'success' : 'warning'}">
+                                ${safeBooking.paymentDetails.status === 'completed' ? 'Confirmed' : 'Pending'}
+                            </span>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Add event listener for bookings tab if not already added
+                if (!document.getElementById('bookings-tab').hasEventListener) {
+                    document.getElementById('bookings-tab').addEventListener('click', () => {
+                        loadEventBookings();
+                    });
+                    document.getElementById('bookings-tab').hasEventListener = true;
+                }
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                showToast('error', 'Failed to load event bookings');
+            }
+        }
+        // Initial load of bookings
+        loadEventBookings();
+
+        // Approve Article
+        async function approveArticle(articleId) {
+            try {
+                const response = await fetch(`/api/company-admin/approve-article/${articleId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to approve article');
+                }
+
+                showToast('success', 'Article approved successfully');
+                await loadArticles();
+                await loadDashboardStats();
+            } catch (error) {
+                console.error('Error approving article:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Reject Article
+        async function rejectArticle(articleId) {
+            try {
+                const response = await fetch(`/api/company-admin/reject-article/${articleId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to reject article');
+                }
+
+                showToast('success', 'Article rejected successfully');
+                await loadArticles();
+                await loadDashboardStats();
+            } catch (error) {
+                console.error('Error rejecting article:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Delete Article
+        async function deleteArticle(articleId) {
+            if (!confirm('Are you sure you want to delete this article?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/company-admin/articles/${articleId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to delete article');
+                }
+
+                showToast('success', 'Article deleted successfully');
+                await loadArticles(); // Refresh articles list
+            } catch (error) {
+                console.error('Error deleting article:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Verify User
+        async function verifyUser(userId, status) {
+            try {
+                const endpoint = status === 'rejected' 
+                    ? `/api/company-admin/reject-verification/${userId}`
+                    : `/api/company-admin/approve-verification/${userId}`;
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to verify user');
+                }
+
+                showToast('success', `User ${status === 'approved' ? 'approved' : 'rejected'} successfully`);
+                await loadPendingUsers();
+                await loadDashboardStats();
+            } catch (error) {
+                console.error('Error verifying user:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Add Article
+        async function submitArticle() {
+            const form = document.getElementById('addArticleForm');
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/api/company-admin/articles', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to add article');
+                }
+
+                showToast('success', 'Article added successfully');
+                form.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addArticleModal')).hide();
+                await loadArticles();
+                await loadDashboardStats();
+            } catch (error) {
+                console.error('Error adding article:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Add Event
+        async function submitEvent(e) {
+            e.preventDefault();
+            const form = document.getElementById('addEventForm');
+            
+            try {
+                const formData = {
+                    title: form.title.value,
+                    shortDescription: form.shortDescription.value,
+                    description: form.description.value,
+                    date: form.date.value,
+                    time: form.time.value,
+                    imageUrl: form.imageUrl.value,
+                    location: {
+                        venue: form.venue.value,
+                        address: form.address.value,
+                        city: form.city.value,
+                        state: form.state.value,
+                        zipCode: form.zipCode.value
+                    },
+                    ticketTypes: Array.from(document.querySelectorAll('.ticket-type')).map(ticket => ({
+                        name: ticket.querySelector('[name="ticketName[]"]').value,
+                        price: parseFloat(ticket.querySelector('[name="ticketPrice[]"]').value),
+                        description: ticket.querySelector('[name="ticketDescription[]"]').value,
+                        availableQuantity: parseInt(ticket.querySelector('[name="ticketQuantity[]"]').value)
+                    })),
+                    status: 'upcoming'
+                };
+
+                console.log('Sending event data:', formData);
+
+                const response = await fetch('/api/company-admin/events', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to add event');
+                }
+
+                showToast('success', 'Event added successfully');
+                form.reset();
+                bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+                await loadEvents();
+            } catch (error) {
+                console.error('Error adding event:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Delete Event
+        async function deleteEvent(eventId) {
+            if (!confirm('Are you sure you want to delete this event?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/company-admin/events/${eventId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to delete event');
+                }
+
+                showToast('success', 'Event deleted successfully');
+                await loadEvents();
+            } catch (error) {
+                console.error('Error deleting event:', error);
+                showToast('error', error.message);
+            }
+        }
+
+        // Show Toast
+        function showToast(type, message) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/company-admin/login.html';
+        }
+
+        // Tab Handling
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (this.getAttribute('href') === '#articles') {
+                    loadArticles();
+                } else if (this.getAttribute('href') === '#events') {
+                    loadEvents();
+                }
+            });
+        });
+
+        // Initial Load
+        loadDashboardStats();
+        loadPendingUsers();
+        loadArticles();
+        loadEvents();
+    </script>
+</body>
+</html>

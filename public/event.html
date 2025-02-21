@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        .event-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .event-image-section {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .event-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .event-info-section {
+            flex: 1;
+        }
+
+        .event-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .event-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .event-description {
+            margin: 1.5rem 0;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .location-details {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .ticket-section {
+            margin: 2rem 0;
+        }
+
+        .ticket-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .ticket-card:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .ticket-info h4 {
+            margin: 0;
+            color: #333;
+        }
+
+        .ticket-price {
+            font-size: 1.25rem;
+            color: #007bff;
+            margin: 0.5rem 0;
+        }
+
+        .ticket-availability {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .ticket-quantity {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quantity-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover:not(:disabled) {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .quantity {
+            font-size: 1.1rem;
+            min-width: 2rem;
+            text-align: center;
+        }
+
+        .booking-form {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .event-container {
+                flex-direction: column;
+            }
+
+            .event-image-section {
+                max-width: 100%;
+            }
+        }
+
+        /* Payment Success Animation */
+        .payment-success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .success-animation {
+            text-align: center;
+        }
+
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: #4bb71b;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #4bb71b;
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+            position: relative;
+            margin: 0 auto 20px;
+        }
+
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4bb71b;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        .success-text {
+            color: #4bb71b;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in 1.3s forwards;
+        }
+
+        .success-details {
+            text-align: center;
+            margin: 20px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in 1.8s forwards;
+        }
+
+        .redirect-text {
+            color: #666;
+            margin-top: 10px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in 2.3s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes scale {
+            0%, 100% {
+                transform: none;
+            }
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 50px #4bb71b;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Payment Modal Styles */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .payment-method-card {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method-card:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .payment-method-card.selected {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .payment-method-card h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .payment-details {
+            margin-top: 1rem;
+        }
+
+        .payment-details .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .payment-details label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .payment-details input,
+        .payment-details select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        /* Form Row */
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Disable button styles */
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .payment-method-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .payment-method-card.selected {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .payment-method-card img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-details {
+            margin-top: 1.5rem;
+        }
+
+        .payment-details .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .payment-details input,
+        .payment-details select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-buttons button {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .btn-proceed {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-proceed:hover {
+            background: #0056b3;
+        }
+
+        /* Login Required Styles */
+        .login-required {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .login-required h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .login-required p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-required .btn {
+            display: inline-block;
+            padding: 0.5rem 2rem;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .login-required .btn:hover {
+            background: #0056b3;
+        }
+
+        /* Loading Animation Styles */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .loading-text {
+            color: #333;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>YogaLife</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/events.html">Events</a>
+            <div class="auth-links" id="authLinks">
+                <a href="/login.html" class="login-btn">Login</a>
+                <a href="/register.html" class="register-btn">Register</a>
+            </div>
+            <div class="user-profile hidden" id="userProfile">
+                <a href="/profile.html" class="profile-link">My Profile</a>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div id="eventDetails" class="container">
+            <!-- Event details will be loaded here -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>We are dedicated to spreading the knowledge of yoga and meditation to enhance lives globally.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/events.html">Events</a></li>
+                    <li><a href="/profile.html">My Profile</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@yogalife.com</p>
+                <p>Phone: +1 234 567 890</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 YogaLife. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="payment-modal" id="paymentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="payment-modal-content" style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px;">
+            <span class="close" onclick="closePaymentModal()" style="float: right; cursor: pointer; font-size: 1.5rem;">&times;</span>
+            <h2>Choose Payment Method</h2>
+            <div class="payment-methods" style="display: grid; gap: 1rem; margin: 1rem 0;">
+                <div class="payment-method-card" onclick="selectPaymentMethod('card')" style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                    <h3>Credit/Debit Card</h3>
+                    <div id="cardDetails" style="display: none; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="16">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate">Expiry Date</label>
+                                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method-card" onclick="selectPaymentMethod('upi')" style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                    <h3>UPI</h3>
+                    <div id="upiDetails" style="display: none; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="upiId">UPI ID</label>
+                            <input type="text" id="upiId" placeholder="yourname@upi">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method-card" onclick="selectPaymentMethod('netbanking')" style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                    <h3>Net Banking</h3>
+                    <div id="netbankingDetails" style="display: none; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="bank">Select Bank</label>
+                            <select id="bank">
+                                <option value="">Select a bank</option>
+                                <option value="sbi">State Bank of India</option>
+                                <option value="hdfc">HDFC Bank</option>
+                                <option value="icici">ICICI Bank</option>
+                                <option value="axis">Axis Bank</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="processPayment()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Pay Now</button>
+        </div>
+    </div>
+
+    <div class="payment-success-overlay" id="paymentSuccessOverlay">
+        <div class="success-animation">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+            <div class="success-text">Payment Successful!</div>
+            <div class="success-details">Your booking has been confirmed.</div>
+            <div class="redirect-text">Redirecting to your profile...</div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processing your payment...</div>
+    </div>
+
+    <script>
+        let selectedTickets = {};
+        let currentEvent = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('id');
+            if (!eventId) {
+                window.location.href = '/events.html';
+                return;
+            }
+            displayEventDetails(eventId);
+            checkAuthStatus();
+        });
+
+        function checkAuthStatus() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const authLinks = document.getElementById('authLinks');
+            const userProfile = document.getElementById('userProfile');
+            
+            if (token && user) {
+                authLinks.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                
+                // Update email field if it exists
+                const emailInput = document.getElementById('email');
+                if (emailInput) {
+                    emailInput.value = user.email;
+                    emailInput.setAttribute('readonly', true);
+                }
+            } else {
+                authLinks.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+            }
+        }
+
+        async function displayEventDetails(eventId) {
+            try {
+                const response = await fetch(`/api/events/${eventId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch event details');
+                }
+                const event = await response.json();
+                currentEvent = event;
+
+                // Check if user is logged in
+                const token = localStorage.getItem('token');
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const isLoggedIn = token && user && user.email;
+
+                const eventDetails = document.getElementById('eventDetails');
+                eventDetails.innerHTML = `
+                    <div class="event-container">
+                        <div class="event-image-section">
+                            <img src="${event.imageUrl || '/images/default-event.jpg'}" alt="${event.title}" class="event-image">
+                        </div>
+                        <div class="event-info-section">
+                            <h1 class="event-title">${event.title}</h1>
+                            <div class="event-meta">
+                                <div class="meta-item">
+                                    <i class="far fa-calendar"></i>
+                                    <span>${new Date(event.date).toLocaleDateString()}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="far fa-clock"></i>
+                                    <span>${event.time}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${event.location.venue}, ${event.location.city}</span>
+                                </div>
+                            </div>
+                            <div class="event-description">
+                                <p>${event.description}</p>
+                            </div>
+                            <div class="location-details">
+                                <h3>Location Details</h3>
+                                <p>${event.location.venue}</p>
+                                <p>${event.location.address}</p>
+                                <p>${event.location.city}, ${event.location.state}</p>
+                            </div>
+                            ${isLoggedIn ? `
+                                <div class="ticket-section">
+                                    <h3>Select Tickets</h3>
+                                    ${event.ticketTypes.map(ticket => `
+                                        <div class="ticket-card">
+                                            <div class="ticket-info">
+                                                <h4>${ticket.name}</h4>
+                                                <p class="ticket-price">₹${ticket.price}</p>
+                                                <p class="ticket-availability">${ticket.availableQuantity} tickets available</p>
+                                            </div>
+                                            <div class="ticket-quantity">
+                                                <button onclick="updateTicketQuantity('${ticket.name}', -1)" class="quantity-btn" ${selectedTickets[ticket.name] <= 0 ? 'disabled' : ''}>-</button>
+                                                <span class="quantity">${selectedTickets[ticket.name] || 0}</span>
+                                                <button onclick="updateTicketQuantity('${ticket.name}', 1)" class="quantity-btn" ${ticket.availableQuantity <= (selectedTickets[ticket.name] || 0) ? 'disabled' : ''}>+</button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="order-summary" id="orderSummary">
+                                    <!-- Order summary will be updated dynamically -->
+                                </div>
+                                <div class="booking-form">
+                                    <h3>Booking Details</h3>
+                                    <form id="bookingForm" onsubmit="submitBooking(event)">
+                                        <div class="form-group">
+                                            <label for="name">Full Name</label>
+                                            <input type="text" id="name" name="name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="phone">Phone Number</label>
+                                            <input type="tel" id="phone" name="phone" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="address">Address</label>
+                                            <input type="text" id="address" name="address" required>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="city">City</label>
+                                                <input type="text" id="city" name="city" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="state">State</label>
+                                                <input type="text" id="state" name="state" required>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Proceed to Pay</button>
+                                    </form>
+                                </div>
+                            ` : `
+                                <div class="login-required">
+                                    <h3>Login Required</h3>
+                                    <p>Please login to book tickets for this event.</p>
+                                    <a href="/login.html" class="btn btn-primary">Login Now</a>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                if (isLoggedIn) {
+                    // Initialize selected tickets
+                    event.ticketTypes.forEach(ticket => {
+                        if (!selectedTickets[ticket.name]) {
+                            selectedTickets[ticket.name] = 0;
+                        }
+                    });
+
+                    // Show booking form if tickets are selected
+                    const bookingForm = document.querySelector('.booking-form');
+                    bookingForm.style.display = 'block';
+
+                    updateOrderSummary();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('eventDetails').innerHTML = `
+                    <div class="error-message">
+                        <p>Failed to load event details. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateTicketQuantity(ticketName, change) {
+            const ticket = currentEvent.ticketTypes.find(t => t.name === ticketName);
+            const currentQuantity = selectedTickets[ticketName] || 0;
+            const newQuantity = currentQuantity + change;
+
+            if (newQuantity >= 0 && newQuantity <= ticket.availableQuantity) {
+                selectedTickets[ticketName] = newQuantity;
+                updateOrderSummary();
+                
+                // Update UI
+                const ticketTypeElement = document.querySelector(`.ticket-type:has(h4:contains('${ticketName}'))`);
+                if (ticketTypeElement) {
+                    const quantitySpan = ticketTypeElement.querySelector('.ticket-quantity span');
+                    const decreaseButton = ticketTypeElement.querySelector('.ticket-quantity button:first-child');
+                    const increaseButton = ticketTypeElement.querySelector('.ticket-quantity button:last-child');
+                    
+                    quantitySpan.textContent = newQuantity;
+                    decreaseButton.disabled = newQuantity <= 0;
+                    increaseButton.disabled = newQuantity >= ticket.availableQuantity;
+                }
+            }
+        }
+
+        function updateOrderSummary() {
+            const orderSummary = document.getElementById('orderSummary');
+            let total = 0;
+            let hasTickets = false;
+
+            const summaryHtml = `
+                <h3>Order Summary</h3>
+                ${Object.entries(selectedTickets).map(([name, quantity]) => {
+                    if (quantity > 0) {
+                        hasTickets = true;
+                        const ticket = currentEvent.ticketTypes.find(t => t.name === name);
+                        const subtotal = ticket.price * quantity;
+                        total += subtotal;
+                        return `
+                            <div class="summary-item">
+                                <span>${name} x ${quantity}</span>
+                                <span>$${subtotal}</span>
+                            </div>
+                        `;
+                    }
+                    return '';
+                }).join('')}
+                ${hasTickets ? `
+                    <div class="summary-total">
+                        <strong>Total Amount:</strong>
+                        <strong>$${total}</strong>
+                    </div>
+                ` : '<p>No tickets selected</p>'}
+            `;
+
+            orderSummary.innerHTML = summaryHtml;
+        }
+
+        async function submitBooking(event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user || !user.email) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Check if any tickets are selected
+            const hasTickets = Object.values(selectedTickets).some(qty => qty > 0);
+            if (!hasTickets) {
+                alert('Please select at least one ticket');
+                return;
+            }
+
+            // Show payment modal
+            showPaymentModal();
+        }
+
+        let selectedPaymentMethod = null;
+
+        function showPaymentModal() {
+            const modal = document.getElementById('paymentModal');
+            modal.style.display = 'flex';
+            resetPaymentForm();
+        }
+
+        function closePaymentModal() {
+            const modal = document.getElementById('paymentModal');
+            modal.style.display = 'none';
+            resetPaymentForm();
+        }
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Update UI
+            document.querySelectorAll('.payment-method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Show relevant details section
+            document.getElementById('cardDetails').style.display = method === 'card' ? 'block' : 'none';
+            document.getElementById('upiDetails').style.display = method === 'upi' ? 'block' : 'none';
+            document.getElementById('netbankingDetails').style.display = method === 'netbanking' ? 'block' : 'none';
+        }
+
+        function resetPaymentForm() {
+            selectedPaymentMethod = null;
+            document.querySelectorAll('.payment-method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('cardDetails').style.display = 'none';
+            document.getElementById('upiDetails').style.display = 'none';
+            document.getElementById('netbankingDetails').style.display = 'none';
+
+            // Reset input fields
+            document.getElementById('cardNumber').value = '';
+            document.getElementById('expiryDate').value = '';
+            document.getElementById('cvv').value = '';
+            document.getElementById('upiId').value = '';
+            document.getElementById('bank').value = '';
+        }
+
+        async function processPayment() {
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const formData = new FormData(document.getElementById('bookingForm'));
+
+            let paymentDetails = {};
+            switch (selectedPaymentMethod) {
+                case 'card':
+                    const cardNumber = document.getElementById('cardNumber').value;
+                    const expiryDate = document.getElementById('expiryDate').value;
+                    const cvv = document.getElementById('cvv').value;
+                    if (!cardNumber || !expiryDate || !cvv) {
+                        alert('Please fill in all card details');
+                        return;
+                    }
+                    paymentDetails = { cardNumber, expiryDate, cvv };
+                    break;
+
+                case 'upi':
+                    const upiId = document.getElementById('upiId').value;
+                    if (!upiId) {
+                        alert('Please enter UPI ID');
+                        return;
+                    }
+                    paymentDetails = { upiId };
+                    break;
+
+                case 'netbanking':
+                    const bank = document.getElementById('bank').value;
+                    if (!bank) {
+                        alert('Please select a bank');
+                        return;
+                    }
+                    paymentDetails = { bank };
+                    break;
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                const bookingData = {
+                    event: currentEvent._id,
+                    tickets: Object.entries(selectedTickets)
+                        .filter(([_, qty]) => qty > 0)
+                        .map(([name, quantity]) => {
+                            const ticket = currentEvent.ticketTypes.find(t => t.name === name);
+                            return {
+                                ticketType: {
+                                    name: ticket.name,
+                                    price: ticket.price
+                                },
+                                quantity
+                            };
+                        }),
+                    bookingDetails: {
+                        name: formData.get('name'),
+                        email: user.email,
+                        phone: formData.get('phone'),
+                        address: formData.get('address'),
+                        city: formData.get('city'),
+                        state: formData.get('state')
+                    },
+                    paymentMethod: selectedPaymentMethod,
+                    paymentDetails
+                };
+
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                if (!response.ok) {
+                    const result = await response.json();
+                    if (response.status === 401) {
+                        alert('Your session has expired. Please login again.');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('userRole');
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    throw new Error(result.error || 'Booking failed');
+                }
+
+                // Close payment modal
+                closePaymentModal();
+
+                // Show success animation
+                const overlay = document.getElementById('paymentSuccessOverlay');
+                overlay.style.display = 'flex';
+
+                // Redirect after animation
+                setTimeout(() => {
+                    window.location.href = '/profile.html';
+                }, 4000);
+
+            } catch (error) {
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+                console.error('Error submitting booking:', error);
+                alert(error.message || 'Error submitting booking. Please try again.');
+            }
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>

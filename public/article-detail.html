@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article - Yoga Knowledge Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .article-header-image {
+            max-height: 400px;
+            object-fit: cover;
+            width: 100%;
+            display: block;
+        }
+        .article-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .article-content {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+        #likeBtn {
+            border: none;
+            background: transparent;
+            padding: 0.5rem;
+            transition: transform 0.2s;
+        }
+        #likeBtn:hover {
+            transform: scale(1.1);
+        }
+        #likeBtn i {
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+        #likeBtn.active i {
+            color: #dc3545;
+        }
+        #likeBtn.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div id="loading-indicator" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div id="error-message" class="alert alert-danger" style="display: none;">
+            Article not found or an error occurred.
+        </div>
+
+        <div id="article-container" style="display: none;">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/articles.html">Articles</a></li>
+                    <li class="breadcrumb-item active" id="article-category"></li>
+                </ol>
+            </nav>
+
+            <article class="mb-5">
+                <h1 id="article-title" class="mb-4"></h1>
+                
+                <div class="article-meta mb-4">
+                    <span>By <span id="article-author"></span></span>
+                    <span class="mx-2">•</span>
+                    <span id="article-date"></span>
+                    <span class="mx-2">•</span>
+                    <span id="readTime">0 min read</span>
+                </div>
+
+                <img id="article-image" class="article-header-image mb-4">
+                
+                <!-- Article Stats - Right after image -->
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <div class="stat-item">
+                        <i class="bi bi-eye"></i>
+                        <span id="viewCount">0</span> views
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button id="likeBtn" class="btn">
+                            <i class="bi bi-heart"></i>
+                            <span id="likeCount" class="ms-1">0</span>
+                        </button>
+                        <div class="dropdown d-inline-block ">
+                            <button class="btn btn-link text-dark p-0 border-0" type="button" id="shareButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-share" style="font-size: 1.5rem;"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="shareButton">
+                                <li><a class="dropdown-item" href="#" onclick="shareOnFacebook()"><i class="bi bi-facebook"></i> Facebook</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="shareOnTwitter()"><i class="bi bi-twitter"></i> Twitter</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="shareOnLinkedIn()"><i class="bi bi-linkedin"></i> LinkedIn</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="shareOnWhatsApp()"><i class="bi bi-whatsapp"></i> WhatsApp</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="article-content" class="article-content mb-4">
+                    <!-- Article content will be inserted here -->
+                </div>
+
+                <!-- Article Analytics Section -->
+                <div class="card mt-1 mb-1">
+                    <div class="card-header bg-dark text-white py-2">
+                        <h5 class="mb-0">Article Analytics</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="text-center">
+                            <div id="analyticsLoading" class="spinner-border text-primary" role="status" style="display: none;">
+                                <span class="visually-hidden">Loading analytics...</span>
+                            </div>
+                            <div id="analyticsError" class="alert alert-danger" style="display: none;">
+                                Failed to load analytics. Please try again later.
+                            </div>
+                            <img id="analyticsGraph" src="" alt="Article Analytics" class="img-fluid rounded shadow-sm" style="width: 100%; height: 300px; object-fit: contain; display: none;">
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Yoga Knowledge Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/articles.html">Articles</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Check if user is authenticated
+        function isAuthenticated() {
+            return localStorage.getItem('token') !== null;
+        }
+
+        async function loadArticle() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const articleId = urlParams.get('id');
+                
+                if (!articleId) {
+                    throw new Error('Article ID not found in URL');
+                }
+
+                const response = await fetch(`/api/articles/${articleId}`);
+                if (!response.ok) {
+                    throw new Error('Article not found');
+                }
+
+                const article = await response.json();
+                
+                // Update page content
+                document.title = `${article.title} - Yoga Knowledge Hub`;
+                document.getElementById('article-title').textContent = article.title;
+                document.getElementById('article-category').textContent = article.category;
+                document.getElementById('article-author').textContent = article.author.name;
+                document.getElementById('article-date').textContent = new Date(article.createdAt).toLocaleDateString();
+                document.getElementById('article-content').innerHTML = article.content;
+                
+                // Handle image
+                const articleImage = document.getElementById('article-image');
+                if (article.imageUrl) {
+                    articleImage.src = article.imageUrl;
+                    articleImage.style.display = 'block';
+                } else {
+                    articleImage.style.display = 'none';
+                }
+
+                // Calculate and display read time
+                const readTime = calculateReadTime(article.content);
+                document.getElementById('readTime').textContent = `${readTime} min read`;
+
+                // Setup feedback features
+                incrementViewCount(articleId);
+                setupLikeButton(articleId);
+                generateAnalytics(articleId);  // Generate Python graphs
+
+                // Show article
+                document.getElementById('loading-indicator').style.display = 'none';
+                document.getElementById('article-container').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading article:', error);
+                document.getElementById('loading-indicator').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        function calculateReadTime(content) {
+            const wordsPerMinute = 200;
+            const wordCount = content.trim().split(/\s+/).length;
+            return Math.ceil(wordCount / wordsPerMinute);
+        }
+
+        function incrementViewCount(articleId) {
+            const viewKey = `article_${articleId}_viewed`;
+            const viewCountElement = document.getElementById('viewCount');
+            
+            // Get current views from localStorage or initialize to 0
+            let views = parseInt(localStorage.getItem(viewKey)) || 0;
+            views++;
+            
+            // Update localStorage and display
+            localStorage.setItem(viewKey, views.toString());
+            viewCountElement.textContent = views;
+            
+            // If user is authenticated, send to server
+            if (isAuthenticated()) {
+                fetch(`/api/articles/${articleId}/view`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }).catch(console.error);
+            }
+        }
+
+        function setupLikeButton(articleId) {
+            const likeBtn = document.getElementById('likeBtn');
+            const likeCountElement = document.getElementById('likeCount');
+            
+            // Only allow registered users to like
+            if (!isAuthenticated()) {
+                likeBtn.classList.add('disabled');
+                likeBtn.title = 'Please login to like this article';
+                return;
+            }
+
+            // Get current user's ID from token
+            const token = localStorage.getItem('token');
+            let userId = '';
+            try {
+                const tokenData = JSON.parse(atob(token.split('.')[1]));
+                userId = tokenData.userId;
+            } catch (error) {
+                console.error('Error getting user ID from token:', error);
+                return;
+            }
+
+            // Initialize like count from localStorage
+            const likeKey = `article_${articleId}_likes`;
+            let likes = parseInt(localStorage.getItem(likeKey)) || 0;
+            likeCountElement.textContent = likes;
+
+            // Check if current user has already liked
+            const hasLikedKey = `article_${articleId}_liked_by_${userId}`;
+            const hasLiked = localStorage.getItem(hasLikedKey) === 'true';
+            
+            // Set initial heart state based on current user's like status
+            if (hasLiked) {
+                likeBtn.classList.add('active');
+                likeBtn.querySelector('i').classList.remove('bi-heart');
+                likeBtn.querySelector('i').classList.add('bi-heart-fill');
+            } else {
+                likeBtn.classList.remove('active');
+                likeBtn.querySelector('i').classList.remove('bi-heart-fill');
+                likeBtn.querySelector('i').classList.add('bi-heart');
+            }
+            
+            // Setup click handler
+            likeBtn.addEventListener('click', async () => {
+                if (!isAuthenticated()) {
+                    alert('Please login to like articles');
+                    return;
+                }
+                
+                try {
+                    // Toggle like state locally for current user
+                    const currentLiked = localStorage.getItem(hasLikedKey) === 'true';
+                    const newLikeCount = currentLiked ? likes - 1 : likes + 1;
+                    
+                    // Update UI
+                    if (!currentLiked) {
+                        likeBtn.classList.add('active');
+                        likeBtn.querySelector('i').classList.remove('bi-heart');
+                        likeBtn.querySelector('i').classList.add('bi-heart-fill');
+                        localStorage.setItem(hasLikedKey, 'true');
+                    } else {
+                        likeBtn.classList.remove('active');
+                        likeBtn.querySelector('i').classList.remove('bi-heart-fill');
+                        likeBtn.querySelector('i').classList.add('bi-heart');
+                        localStorage.setItem(hasLikedKey, 'false');
+                    }
+                    
+                    // Update like count
+                    localStorage.setItem(likeKey, newLikeCount.toString());
+                    likeCountElement.textContent = newLikeCount;
+                    likes = newLikeCount;
+                    
+                } catch (error) {
+                    console.error('Error updating like:', error);
+                }
+            });
+        }
+
+        async function generateAnalytics(articleId) {
+            const graphImg = document.getElementById('analyticsGraph');
+            const loadingSpinner = document.getElementById('analyticsLoading');
+            const errorDiv = document.getElementById('analyticsError');
+            
+            // Reset display
+            loadingSpinner.style.display = 'inline-block';
+            graphImg.style.display = 'none';
+            errorDiv.style.display = 'none';
+            
+            try {
+                // Generate new graph
+                const response = await fetch(`/api/analytics/articles/analytics/${articleId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Add timestamp to prevent caching
+                    const timestamp = new Date().getTime();
+                    graphImg.src = `/stats/article_stats_${articleId}.png?t=${timestamp}`;
+                    
+                    // Show graph when it loads
+                    graphImg.onload = function() {
+                        loadingSpinner.style.display = 'none';
+                        graphImg.style.display = 'block';
+                    };
+                    
+                    // Handle error loading image
+                    graphImg.onerror = function() {
+                        loadingSpinner.style.display = 'none';
+                        errorDiv.style.display = 'block';
+                    };
+                } else {
+                    loadingSpinner.style.display = 'none';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error generating analytics:', error);
+                loadingSpinner.style.display = 'none';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareOnTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+        }
+
+        function shareOnLinkedIn() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`, '_blank');
+        }
+
+        function shareOnWhatsApp() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            window.open(`https://api.whatsapp.com/send?text=${title}%20${url}`, '_blank');
+        }
+
+        // Load article when page loads
+        document.addEventListener('DOMContentLoaded', loadArticle);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
